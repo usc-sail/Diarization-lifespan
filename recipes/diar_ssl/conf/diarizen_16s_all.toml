@@ -1,0 +1,81 @@
+[meta]
+save_dir = "exp"
+seed = 3407
+
+[finetune]
+finetune = true
+ckpt_dir = "/YOUR_PATH/Diarization-lifespan/recipes/diar_ssl/wavlm-large/diarizen_hf/diarizen.bin"
+avg_ckpt_num=1
+
+[trainer]
+path = "trainer_single_opt.Trainer"
+[trainer.args]
+max_epochs = 30
+gradient_percentile = 90
+gradient_history_size = 1000
+save_max_score = false
+save_ckpt_interval = 1
+max_patience = 10
+max_num_checkpoints = 30
+gradient_accumulation_steps = 1
+validation_interval = 1
+freeze_wavlm = true
+lr_decay = false
+use_one_cycle_lr = false
+validation_before_training = false
+
+[optimizer]
+path = "torch.optim.AdamW"
+[optimizer.args]
+lr = 1e-3
+
+[model]
+path = "diarizen.models.eend.model_wavlm_conformer_diarizen.Model"
+[model.args]
+wavlm_src = "wavlm_large_s80_md"
+wavlm_layer_num = 25
+wavlm_feat_dim = 1024
+attention_in = 256
+ffn_hidden = 1024
+num_head = 4
+num_layer = 4
+dropout = 0.1
+chunk_size = 16
+use_posi = false
+output_activate_function = false
+max_speakers_per_frame = 4
+selected_channel = 0
+max_speakers_per_chunk = 4
+
+[train_dataset]
+path = "dataset.DiarizationDataset"
+[train_dataset.args]
+scp_file = "data/AMI_AliMeeting_AISHELL4_Play_Senior/train/wav.scp"
+rttm_file = "data/AMI_AliMeeting_AISHELL4_Play_Senior/train/rttm"
+uem_file = "data/AMI_AliMeeting_AISHELL4_Play_Senior/train/all.uem"
+chunk_size = 16
+chunk_shift = 12
+sample_rate = 16000
+
+[train_dataset.dataloader]
+batch_size = 16
+num_workers = 4
+drop_last = true
+pin_memory = true
+
+[validate_dataset]
+path = "dataset.DiarizationDataset"
+[validate_dataset.args]
+scp_file = "data/AMI_AliMeeting_AISHELL4_Play_Senior/dev/wav.scp"
+rttm_file = "data/AMI_AliMeeting_AISHELL4_Play_Senior/dev/rttm"
+uem_file = "data/AMI_AliMeeting_AISHELL4_Play_Senior/dev/all.uem"
+chunk_size = 16
+chunk_shift = 16
+sample_rate = 16000
+
+[validate_dataset.dataloader]
+batch_size = 8
+num_workers = 4
+drop_last = true
+pin_memory = true
+
